@@ -470,6 +470,8 @@ static NSDictionary* org_apache_cordova_contacts_defaultFields = nil;
     bool bSuccess = TRUE;
     ABMutableMultiValueRef multi = nil;
 
+    bUpdate = FALSE; // FIXME: Always recreate contact fields
+
     if (!bUpdate) {
         multi = [self allocStringMultiValueFromArray:fieldArray];
         bSuccess = [self setValue:multi forProperty:prop inRecord:person];
