@@ -47,6 +47,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.RemoteException;
@@ -252,6 +253,8 @@ public class ContactAccessorSdk5 extends ContactAccessor {
             columnsToFetch.add(CommonDataKinds.Im._ID);
             columnsToFetch.add(CommonDataKinds.Im.DATA);
             columnsToFetch.add(CommonDataKinds.Im.TYPE);
+            columnsToFetch.add(CommonDataKinds.Im.LABEL);
+            columnsToFetch.add(CommonDataKinds.Im.CUSTOM_PROTOCOL);
         }
         if (isRequired("note", populate)) {
             columnsToFetch.add(CommonDataKinds.Note.NOTE);
@@ -904,7 +907,15 @@ public class ContactAccessorSdk5 extends ContactAccessor {
             im.put("id", cursor.getString(cursor.getColumnIndex(CommonDataKinds.Im._ID)));
             im.put("pref", false); // Android does not store pref attribute
             im.put("value", cursor.getString(cursor.getColumnIndex(CommonDataKinds.Im.DATA)));
-            im.put("type", getImType(cursor.getString(cursor.getColumnIndex(CommonDataKinds.Im.PROTOCOL))));
+
+            String type = getImType(cursor.getInt(cursor.getColumnIndex(CommonDataKinds.Im.PROTOCOL)));
+
+            if (type != "custom") {
+                im.put("type", type);
+            } else {
+                im.put("type", "" + cursor.getString(cursor.getColumnIndex(CommonDataKinds.Im.CUSTOM_PROTOCOL))); // TMM
+            }
+            
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
